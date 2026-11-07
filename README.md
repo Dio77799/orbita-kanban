@@ -24,6 +24,24 @@ La mayoría de tableros son listas de tareas con columnas. Kanban de verdad tien
 - Exportar e importar el tablero en JSON, con validación del archivo.
 - Guardado automático en `localStorage`; si el navegador no lo permite, la app sigue funcionando en memoria.
 
+## Módulos
+
+| Módulo | Qué hace |
+|---|---|
+| Tablero | El Kanban: límites WIP, métricas, arrastre, teclado, búsqueda, exportar/importar |
+| Enfoque | Pomodoro ligado a una tarea del tablero (cada sesión suma en la tarjeta), descansos largos cada 4 ciclos, historial y totales de hoy y de 7 días, aviso con sonido y notificación |
+| Agenda | Calendario mensual con eventos y alarmas, y las tareas del tablero que vencen cada día |
+| Integraciones | Clima (OpenWeatherMap), Spotify (estado, reproducir/pausar/saltar con PKCE, o una playlist incrustada sin cuenta) y un asistente con Gemini que divide una tarea en subtareas o resume el tablero |
+| Ajustes | Claves de API propias |
+
+## Claves de API
+
+Las integraciones usan **tus propias claves**, que se escriben en Ajustes y se guardan solo en el `localStorage` de tu navegador. No están en el código ni en el repositorio.
+
+- **OpenWeatherMap:** API key gratuita de openweathermap.org.
+- **Spotify:** solo el Client ID de una app en developer.spotify.com. Registra como Redirect URI la URL donde abras Órbita (la pantalla de Ajustes te la muestra). El flujo es Authorization Code con PKCE, así que no hay secreto en el navegador. Controlar la reproducción requiere Spotify Premium; la playlist incrustada funciona sin cuenta.
+- **Gemini:** API key de aistudio.google.com. Restríngela por dominio (HTTP referrer) en la consola de Google, porque una clave usada desde el navegador es visible para quien use ese navegador.
+
 ## Usarlo
 
 Abre `index.html` en el navegador. No hay nada que instalar.
@@ -33,7 +51,8 @@ Abre `index.html` en el navegador. No hay nada que instalar.
 ```
 index.html   estructura y diálogos
 styles.css   tema visual
-app.js       estado, métricas, arrastre, teclado, exportar/importar
+app.js       tablero: estado, métricas, arrastre, teclado, exportar/importar
+modulos.js   enfoque, agenda, integraciones y claves
 ```
 
 ## Licencia

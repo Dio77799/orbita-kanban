@@ -16,7 +16,15 @@
       <p>Kanban con límites WIP y métricas de flujo</p>
     </div>
   </div>
-  <div class="acciones">
+  <nav class="modulos" aria-label="Módulos">
+    <a href="#tablero" data-mod="tablero">Tablero</a>
+    <a href="#enfoque" data-mod="enfoque">Enfoque</a>
+    <a href="#agenda" data-mod="agenda">Agenda</a>
+    <a href="#integraciones" data-mod="integraciones">Integraciones</a>
+    <a href="#ajustes" data-mod="ajustes">Ajustes</a>
+    <span class="reloj" id="reloj" aria-label="Hora actual"></span>
+  </nav>
+  <div class="acciones" data-solo="tablero">
     <input id="buscar" type="search" placeholder="Buscar tareas o #etiqueta" aria-label="Buscar tareas">
     <select id="filtroPrioridad" aria-label="Filtrar por prioridad">
       <option value="">Todas</option>
@@ -30,11 +38,133 @@
   </div>
 </header>
 
+<div class="modulo" id="mod-tablero">
 <section class="metricas" id="metricas" aria-label="Métricas del flujo"></section>
 
 <main class="tablero" id="tablero" aria-label="Tablero"></main>
 
 <p class="ayuda">Arrastra las tarjetas o selecciónalas y usa <kbd>Alt</kbd> + <kbd>←</kbd> <kbd>→</kbd> para moverlas de columna y <kbd>Alt</kbd> + <kbd>↑</kbd> <kbd>↓</kbd> para ordenarlas. Todo se guarda en este navegador.</p>
+</div>
+
+<!-- ENFOQUE: Pomodoro ligado a tareas -->
+<div class="modulo" id="mod-enfoque" hidden>
+  <div class="rejilla">
+    <section class="panel corte pomodoro">
+      <h2>Pomodoro</h2>
+      <div class="fase" id="pomoFase">Enfoque</div>
+      <svg viewBox="0 0 200 200" class="aro" aria-hidden="true">
+        <circle cx="100" cy="100" r="88" class="aro-fondo"/>
+        <circle cx="100" cy="100" r="88" class="aro-progreso" id="pomoAro"/>
+      </svg>
+      <div class="tiempo" id="pomoTiempo" aria-live="polite">25:00</div>
+      <label>Trabajando en
+        <select id="pomoTarea"><option value="">Sin tarea</option></select>
+      </label>
+      <div class="botones">
+        <button class="btn primario" id="pomoIniciar">Iniciar</button>
+        <button class="btn" id="pomoSaltar">Saltar fase</button>
+        <button class="btn" id="pomoReiniciar">Reiniciar</button>
+      </div>
+      <div class="fila3">
+        <label>Enfoque (min)<input type="number" id="pomoEnfoque" min="1" max="120" value="25"></label>
+        <label>Descanso (min)<input type="number" id="pomoDescanso" min="1" max="60" value="5"></label>
+        <label>Descanso largo<input type="number" id="pomoLargo" min="1" max="60" value="15"></label>
+      </div>
+    </section>
+    <section class="panel corte">
+      <h2>Historial de enfoque</h2>
+      <div class="resumen" id="pomoResumen"></div>
+      <ol class="historial" id="pomoHistorial"></ol>
+    </section>
+  </div>
+</div>
+
+<!-- AGENDA: calendario, eventos, alarmas y vencimientos del tablero -->
+<div class="modulo" id="mod-agenda" hidden>
+  <div class="rejilla">
+    <section class="panel corte">
+      <div class="cal-cab">
+        <button class="btn" id="calAnterior" aria-label="Mes anterior">‹</button>
+        <h2 id="calTitulo"></h2>
+        <button class="btn" id="calSiguiente" aria-label="Mes siguiente">›</button>
+      </div>
+      <div class="calendario" id="calendario"></div>
+      <p class="nota">Los puntos dorados son eventos; los cian, tareas del tablero que vencen ese día.</p>
+    </section>
+    <section class="panel corte">
+      <h2 id="diaTitulo">Día</h2>
+      <ul class="eventos" id="diaEventos"></ul>
+      <form id="formEvento" class="form-evento">
+        <input name="titulo" placeholder="Nuevo evento o alarma" required maxlength="80">
+        <input name="hora" type="time" required>
+        <label class="check"><input type="checkbox" name="alarma"> Alarma</label>
+        <button class="btn primario">Agregar</button>
+      </form>
+      <p class="nota" id="notaAlarmas"></p>
+    </section>
+  </div>
+</div>
+
+<!-- INTEGRACIONES -->
+<div class="modulo" id="mod-integraciones" hidden>
+  <div class="rejilla">
+    <section class="panel corte">
+      <h2>Clima <small>OpenWeatherMap</small></h2>
+      <form id="formClima" class="form-linea">
+        <input name="ciudad" placeholder="Ciudad, p. ej. Tegucigalpa" required>
+        <button class="btn primario">Consultar</button>
+      </form>
+      <div id="clima" class="salida"></div>
+    </section>
+    <section class="panel corte">
+      <h2>Música <small>Spotify</small></h2>
+      <div id="spotifyEstado" class="salida"></div>
+      <div class="botones">
+        <button class="btn primario" id="spotifyConectar">Conectar Spotify</button>
+        <button class="btn" id="spotifyAnterior" aria-label="Anterior">⏮</button>
+        <button class="btn" id="spotifyPlay" aria-label="Reproducir o pausar">⏯</button>
+        <button class="btn" id="spotifySiguiente" aria-label="Siguiente">⏭</button>
+      </div>
+      <label>Playlist o álbum para incrustar (enlace de Spotify, no requiere cuenta)
+        <input id="spotifyEmbedUrl" placeholder="https://open.spotify.com/playlist/...">
+      </label>
+      <div id="spotifyEmbed"></div>
+    </section>
+    <section class="panel corte ancho">
+      <h2>Asistente <small>Gemini</small></h2>
+      <div class="botones">
+        <select id="iaTarea"><option value="">Elige una tarea del tablero</option></select>
+        <button class="btn primario" id="iaSubtareas">Dividir en subtareas</button>
+        <button class="btn" id="iaResumen">Resumir el tablero</button>
+      </div>
+      <div id="iaSalida" class="salida"></div>
+      <div class="botones" id="iaAcciones" hidden>
+        <button class="btn primario" id="iaAgregar">Agregar subtareas a Pendiente</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- AJUSTES: claves -->
+<div class="modulo" id="mod-ajustes" hidden>
+  <section class="panel corte estrecho">
+    <h2>Claves de API</h2>
+    <p class="nota">Se guardan solo en este navegador (localStorage). No están en el código ni en el repositorio. Usa claves propias y restríngelas por dominio en cada servicio.</p>
+    <form id="formClaves">
+      <label>OpenWeatherMap API key<input name="weather" type="password" autocomplete="off" placeholder="clave de openweathermap.org"></label>
+      <label>Spotify Client ID<input name="spotify" autocomplete="off" placeholder="Client ID de developer.spotify.com"></label>
+      <p class="nota">Redirect URI que debes registrar en tu app de Spotify: <code id="redirectUri"></code></p>
+      <label>Google Gemini API key<input name="gemini" type="password" autocomplete="off" placeholder="clave de aistudio.google.com"></label>
+      <label>Modelo de Gemini<input name="geminiModelo" autocomplete="off" placeholder="gemini-2.5-flash"></label>
+      <div class="pie">
+        <button type="button" class="btn peligro" id="borrarClaves">Borrar claves</button>
+        <span></span>
+        <button class="btn primario">Guardar</button>
+      </div>
+      <p class="nota" id="clavesEstado"></p>
+    </form>
+  </section>
+</div>
 
 <dialog id="dlgTarjeta">
   <form method="dialog" id="formTarjeta">
@@ -89,5 +219,6 @@
 </dialog>
 
 <script src="app.js"></script>
+<script src="modulos.js"></script>
 </body>
 </html>

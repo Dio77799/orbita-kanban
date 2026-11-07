@@ -147,6 +147,7 @@ function pintarTarjeta(t, col) {
     if (!t.terminada && new Date(t.vence + 'T23:59:59') < new Date()) v.classList.add('vencida');
     meta.append(v);
   }
+  if (t.pomodoros) meta.append(texto(crear('span', 'pomos'), `◷ ${t.pomodoros}`));
   const ultima = t.historial[t.historial.length - 1];
   meta.append(texto(crear('span', 'edad'), t.terminada ? '✓ ' + dias(t.terminada - t.creada) : dias(Date.now() - ultima.en) + ' aquí'));
   el.append(meta);
