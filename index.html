@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Órbita · Kanban</title>
+<meta name="description" content="Tablero Kanban con límites WIP y métricas de flujo, sin dependencias y 100 % local.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="barra">
+  <div class="marca">
+    <span class="logo" aria-hidden="true"></span>
+    <div>
+      <h1>Órbita</h1>
+      <p>Kanban con límites WIP y métricas de flujo</p>
+    </div>
+  </div>
+  <div class="acciones">
+    <input id="buscar" type="search" placeholder="Buscar tareas o #etiqueta" aria-label="Buscar tareas">
+    <select id="filtroPrioridad" aria-label="Filtrar por prioridad">
+      <option value="">Todas</option>
+      <option value="alta">Alta</option>
+      <option value="media">Media</option>
+      <option value="baja">Baja</option>
+    </select>
+    <button class="btn" id="btnColumna">+ Columna</button>
+    <button class="btn" id="btnExportar" title="Descargar el tablero en JSON">Exportar</button>
+    <label class="btn" title="Cargar un tablero desde JSON">Importar<input id="importar" type="file" accept="application/json" hidden></label>
+  </div>
+</header>
+
+<section class="metricas" id="metricas" aria-label="Métricas del flujo"></section>
+
+<main class="tablero" id="tablero" aria-label="Tablero"></main>
+
+<p class="ayuda">Arrastra las tarjetas o selecciónalas y usa <kbd>Alt</kbd> + <kbd>←</kbd> <kbd>→</kbd> para moverlas de columna y <kbd>Alt</kbd> + <kbd>↑</kbd> <kbd>↓</kbd> para ordenarlas. Todo se guarda en este navegador.</p>
+
+<dialog id="dlgTarjeta">
+  <form method="dialog" id="formTarjeta">
+    <h2 id="dlgTitulo">Nueva tarea</h2>
+    <label>Título<input name="titulo" required maxlength="120"></label>
+    <label>Descripción<textarea name="descripcion" rows="4" maxlength="2000"></textarea></label>
+    <div class="fila">
+      <label>Prioridad
+        <select name="prioridad">
+          <option value="baja">Baja</option>
+          <option value="media" selected>Media</option>
+          <option value="alta">Alta</option>
+        </select>
+      </label>
+      <label>Vence<input type="date" name="vence"></label>
+    </div>
+    <label>Etiquetas <small>(separadas por coma)</small><input name="etiquetas" placeholder="frontend, bug"></label>
+    <div class="pie">
+      <button type="button" class="btn peligro" id="btnBorrar">Borrar</button>
+      <span></span>
+      <button type="button" class="btn" value="cancelar" id="btnCancelar">Cancelar</button>
+      <button class="btn primario" value="guardar">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgColumna">
+  <form method="dialog" id="formColumna">
+    <h2 id="dlgColTitulo">Columna</h2>
+    <label>Nombre<input name="nombre" required maxlength="40"></label>
+    <label>Límite WIP <small>(0 = sin límite)</small><input name="wip" type="number" min="0" max="99" value="0"></label>
+    <label class="check"><input type="checkbox" name="terminal"> Esta columna marca la tarea como terminada</label>
+    <div class="pie">
+      <button type="button" class="btn peligro" id="btnBorrarCol">Borrar columna</button>
+      <span></span>
+      <button type="button" class="btn" id="btnCancelarCol">Cancelar</button>
+      <button class="btn primario" value="guardar">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
