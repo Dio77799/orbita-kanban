@@ -225,6 +225,16 @@ function teclaTarjeta(ev, id) {
   ev.preventDefault();
 }
 
+// Confirmación y avisos dentro de la página (alert/confirm no funcionan en todos los marcos).
+function confirmar(mensaje, soloAviso) {
+  const d = $('#dlgConfirmar');
+  $('#txtConfirmar').textContent = mensaje;
+  d.querySelector('button[value="no"]').hidden = !!soloAviso;
+  d.returnValue = '';
+  d.showModal();
+  return new Promise(res => d.addEventListener('close', () => res(d.returnValue === 'si'), { once: true }));
+}
+
 // ── Diálogo de tarjeta ───────────────────────────────────────────────────
 const dlgT = $('#dlgTarjeta');
 const formT = $('#formTarjeta');
@@ -267,12 +277,13 @@ formT.addEventListener('submit', () => {
   pintar();
 });
 $('#btnCancelar').addEventListener('click', () => dlgT.close());
-$('#btnBorrar').addEventListener('click', () => {
-  if (!editando.id || !confirm('¿Borrar esta tarea?')) return;
+$('#btnBorrar').addEventListener('click', async () => {
+  if (!editando.id) return;
+  dlgT.close();
+  if (!(await confirmar('¿Borrar esta tarea?'))) return;
   const r = buscarTarjeta(editando.id);
   r.col.tarjetas.splice(r.i, 1);
   guardar();
-  dlgT.close();
   pintar();
 });
 
@@ -311,15 +322,15 @@ formC.addEventListener('submit', () => {
   pintar();
 });
 $('#btnCancelarCol').addEventListener('click', () => dlgC.close());
-$('#btnBorrarCol').addEventListener('click', () => {
+$('#btnBorrarCol').addEventListener('click', async () => {
   const c = estado.columnas.find(x => x.id === colEditando);
   if (!c) return;
-  if (estado.columnas.length === 1) { alert('El tablero necesita al menos una columna.'); return; }
-  if (c.tarjetas.length && !confirm(`La columna tiene ${c.tarjetas.length} tareas. Se moverán a la primera columna. ¿Continuar?`)) return;
+  dlgC.close();
+  if (estado.columnas.length === 1) { await confirmar('El tablero necesita al menos una columna.', true); return; }
+  if (c.tarjetas.length && !(await confirmar(`La columna tiene ${c.tarjetas.length} tareas. Se moverán a la primera columna. ¿Continuar?`))) return;
   estado.columnas = estado.columnas.filter(x => x !== c);
   estado.columnas[0].tarjetas.push(...c.tarjetas);
   guardar();
-  dlgC.close();
   pintar();
 });
 $('#btnColumna').addEventListener('click', () => abrirColumna(null));
@@ -340,12 +351,12 @@ $('#importar').addEventListener('change', async (ev) => {
   try {
     const datos = JSON.parse(await f.text());
     if (!valido(datos)) throw new Error('formato');
-    if (!confirm('Esto reemplaza el tablero actual. ¿Continuar?')) return;
+    if (!(await confirmar('Esto reemplaza el tablero actual. ¿Continuar?'))) return;
     estado = datos;
     guardar();
     pintar();
   } catch (e) {
-    alert('El archivo no es un tablero válido de Órbita.');
+    confirmar('El archivo no es un tablero válido de Órbita.', true);
   }
 });
 
