@@ -57,4 +57,4 @@ modulos.js   enfoque, agenda, integraciones y claves
 
 ## Licencia
 
-MIT
+[MIT](LICENSE) © 2026 James V (Dio77799)
